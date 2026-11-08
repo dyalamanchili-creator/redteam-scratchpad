@@ -23,6 +23,21 @@ any payload at a system you don't have written permission to test. See [SCOPE.md
 
 ---
 
+## 🔴 Live demo — PHP critical RCE briefing
+
+An interactive, manager-friendly explainer of **CVE-2026-109618 / CVE-2026-109619**, hosted
+on GitHub Pages (open in any browser — no setup, no AWS access):
+
+- **▶️ Interactive demo:** <https://dyalamanchili-creator.github.io/redteam-scratchpad/labs/php-cve-2026-109618-109619/exec-demo.html>
+- **🏠 Site home:** <https://dyalamanchili-creator.github.io/redteam-scratchpad/>
+- **📄 Markdown version** (renders inline on GitHub): [exec-demo.md](labs/php-cve-2026-109618-109619/exec-demo.md)
+
+Open the interactive link and use the **Unpatched ↔ Patched** toggle to show how the flaw
+works. (The `.html` source only renders as a live page via the hosted link above — GitHub
+shows the file as source, not a running page.)
+
+---
+
 ## Layout
 
 ```
@@ -47,5 +62,5 @@ docs/         Cross-cutting notes, methodology, references
 ## Quick start
 
 - Read [SCOPE.md](SCOPE.md) first.
-- Start with [labs/php-cve-2024-4577/README.md](labs/php-cve-2024-4577/README.md).
+- See the live demo above, or its lab: [labs/php-cve-2026-109618-109619/README.md](labs/php-cve-2026-109618-109619/README.md).
 - Deploy a test target: [lambda/README.md](lambda/README.md).
