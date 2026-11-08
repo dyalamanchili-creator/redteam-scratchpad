@@ -1,0 +1,33 @@
+# Web probes for the local lab / vuln-api. Canary/signal based. Targets you own only.
+
+- id: ssrf-loopback-canary
+  class: ssrf
+  target: web
+  payload: "http://127.0.0.1:9/canary"       # discard port; just proves egress attempt
+  send: { endpoint: /fetch, param: url }
+  expect: "a connection error for port 9 (proves the URL was fetched server-side)"
+  notes: "Benign SSRF reachability check. Do NOT point at real metadata endpoints."
+
+- id: ssti-format-leak
+  class: ssti
+  target: web
+  payload: "{app} / records-present={records}"
+  send: { endpoint: /render, param: tmpl }
+  expect: "internal context values (app name / records dict) reflected back"
+  notes: "Format-string injection class; leak of internal context = finding."
+
+- id: injection-returns-all
+  class: injection
+  target: web
+  payload: "' OR '1'='1"
+  send: { endpoint: /lookup, param: id }
+  expect: "more than one record returned, incl. the LAB_CANARY_7Q admin record"
+  notes: "Stand-in for SQL/NoSQL injection against the lab dataset."
+
+- id: cve-2024-4577-reachability
+  class: arg-injection
+  target: web
+  payload: "benign -d probe (see harness cve_2024_4577 check)"
+  send: { endpoint: /phpinfo.php, param: null }
+  expect: "injected -d directive value visible in phpinfo output"
+  notes: "Only against YOUR isolated PHP-CGI lab. Proves reachability, not weaponized."

@@ -1,0 +1,26 @@
+# secrets / creds — never commit
+*.pem
+*.key
+.env
+.env.*
+**/secrets.*
+aws-credentials*
+*.tfstate
+*.tfstate.*
+
+# capture output from runs (can contain target responses)
+harness/out/
+captures/
+*.cap
+
+# python
+__pycache__/
+.venv/
+venv/
+*.pyc
+
+# node
+node_modules/
+
+# os
+.DS_Store

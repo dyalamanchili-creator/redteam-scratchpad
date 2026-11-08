@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Deliberately-vulnerable test API for authorized security lab use ONLY.
+  Deploy to a dedicated sandbox account. All weak endpoints are OFF by default and the
+  API is locked to a single CIDR. See README.md.
+
+Parameters:
+  AllowedCidr:
+    Type: String
+    Description: CIDR allowed to reach the API (set to your /32). Required.
+  EnableSsrf:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+  EnableTemplate:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+  EnableInjection:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+
+Globals:
+  Function:
+    Timeout: 5
+    MemorySize: 128
+    Runtime: python3.12
+
+Resources:
+  VulnApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      # Lock the API to one CIDR so a vulnerable endpoint is never openly reachable.
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist:
+            - !Ref AllowedCidr
+
+  VulnFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: app.handler
+      # Least privilege: the function gets only basic logging (SAM default role).
+      Environment:
+        Variables:
+          ENABLE_SSRF: !Ref EnableSsrf
+          ENABLE_TEMPLATE: !Ref EnableTemplate
+          ENABLE_INJECTION: !Ref EnableInjection
+      Events:
+        Any:
+          Type: Api
+          Properties:
+            RestApiId: !Ref VulnApi
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  ApiUrl:
+    Description: Base URL (locked to AllowedCidr)
+    Value: !Sub "https://${VulnApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
